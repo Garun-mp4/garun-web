@@ -21,6 +21,11 @@ interface ResponsiveLayout {
   }>;
 }
 
+interface TouchScrollState {
+  touchEnabled: boolean;
+  className: string;
+}
+
 test('homepage interactions, featured projects, FAQ and contact route work', async ({ page }) => {
   test.skip(test.info().project.name === 'mobile-chromium', 'Desktop navigation interaction is covered by the dedicated mobile menu test.');
   const errors = captureRuntimeErrors(page);
@@ -116,6 +121,53 @@ test('privacy policy uses the same smooth-scroll runtime', async ({ page }) => {
   await expect(page.locator('html')).toHaveClass(/lenis-autoToggle/);
   await expect(page.locator('html')).toHaveCSS('scroll-behavior', 'auto');
   expect(errors).toEqual([]);
+});
+
+test('touch scrolling uses Lenis smooth mode on mobile', async ({ page }) => {
+  test.skip(test.info().project.name !== 'mobile-chromium', 'Touch scrolling is covered by the mobile project.');
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.goto('/');
+
+  const touchState = await page.evaluate<TouchScrollState>(`(() => {
+    const createTouch = (clientY) => new Touch({
+      identifier: 1,
+      target: document.documentElement,
+      clientX: 180,
+      clientY,
+      pageX: 180,
+      pageY: clientY,
+      screenX: 180,
+      screenY: clientY,
+      radiusX: 1,
+      radiusY: 1,
+      rotationAngle: 0,
+      force: 1,
+    });
+    const start = createTouch(600);
+    const move = createTouch(420);
+    document.documentElement.dispatchEvent(new TouchEvent('touchstart', {
+      bubbles: true,
+      cancelable: true,
+      touches: [start],
+      targetTouches: [start],
+      changedTouches: [start],
+    }));
+    document.documentElement.dispatchEvent(new TouchEvent('touchmove', {
+      bubbles: true,
+      cancelable: true,
+      touches: [move],
+      targetTouches: [move],
+      changedTouches: [move],
+    }));
+
+    return {
+      touchEnabled: window.lenis?.touch === true,
+      className: document.documentElement.className,
+    };
+  })()`);
+
+  expect(touchState.touchEnabled).toBe(true);
+  expect(touchState.className).toMatch(/\blenis-smooth\b/);
 });
 
 test('responsive headings stay inside the viewport on every route', async ({ page }) => {
