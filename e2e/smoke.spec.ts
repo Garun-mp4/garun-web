@@ -46,6 +46,18 @@ test('homepage interactions, featured projects, FAQ and contact route work', asy
   await page.mouse.move(previewBounds.x + previewBounds.width * 0.75, previewBounds.y + previewBounds.height / 2);
   await expect(customCursor).toHaveClass(/is-slider/);
   await expect(customCursor).toHaveCSS('width', '50px');
+  const firstShot = heroPreview.locator('.hero-preview__shot').first();
+  const firstShotBeforeDrag = await firstShot.boundingBox();
+  expect(firstShotBeforeDrag).not.toBeNull();
+  if (!firstShotBeforeDrag) throw new Error('First hero shot is not measurable');
+  await page.mouse.down();
+  await page.mouse.move(previewBounds.x + previewBounds.width * 0.9, previewBounds.y + previewBounds.height / 2, { steps: 6 });
+  await page.waitForTimeout(80);
+  const firstShotDuringDrag = await firstShot.boundingBox();
+  expect(firstShotDuringDrag).not.toBeNull();
+  if (!firstShotDuringDrag) throw new Error('First hero shot disappeared during drag');
+  expect(Math.abs(firstShotDuringDrag.x - firstShotBeforeDrag.x)).toBeGreaterThan(30);
+  await page.mouse.up();
   const beforeManualAdvance = await marqueeTrack.evaluate(node => node.style.transform);
   await page.mouse.click(previewBounds.x + previewBounds.width * 0.75, previewBounds.y + previewBounds.height / 2);
   await expect.poll(() => marqueeTrack.evaluate(node => node.style.transform)).not.toBe(beforeManualAdvance);

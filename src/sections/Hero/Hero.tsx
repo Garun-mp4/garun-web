@@ -4,6 +4,8 @@ import { projects } from '../../data/projects.js';
 
 const words = 'Проектирую структуру, собираю frontend, адаптив и интерактив — от формы до квиза и калькулятора.'.split(' ');
 const MARQUEE_DURATION_MS = 42_000;
+const DRAG_THRESHOLD_PX = 6;
+const MANUAL_STEP_DURATION_MS = 460;
 type PointerSession = { pointerId: number; startX: number; startOffset: number; moved: boolean };
 
 export function Hero(): React.ReactElement {
@@ -26,29 +28,49 @@ export function Hero(): React.ReactElement {
     return offset;
   }, []);
 
+  const getRenderedTrackOffset = React.useCallback((): number => {
+    const track = previewTrackRef.current;
+    if (!track) return offsetRef.current;
+    const transform = getComputedStyle(track).transform;
+    if (!transform || transform === 'none') return offsetRef.current;
+
+    const values = transform.slice(transform.indexOf('(') + 1, -1).split(',').map(Number);
+    const translateX = transform.startsWith('matrix3d(') ? (values[12] ?? NaN) : (values[4] ?? NaN);
+    return Number.isFinite(translateX) ? -translateX : offsetRef.current;
+  }, []);
+
+  const stopManualTransition = React.useCallback((): number => {
+    const renderedOffset = getRenderedTrackOffset();
+    if (manualTimeoutRef.current !== null) {
+      window.clearTimeout(manualTimeoutRef.current);
+      manualTimeoutRef.current = null;
+    }
+    if (previewTrackRef.current) previewTrackRef.current.style.transition = 'none';
+    return applyTrackOffset(renderedOffset);
+  }, [applyTrackOffset, getRenderedTrackOffset]);
+
   const moveBy = React.useCallback((direction: -1 | 1): void => {
     const track = previewTrackRef.current;
     const cycleWidth = cycleWidthRef.current;
     const itemStep = itemStepRef.current;
     if (!track || cycleWidth <= 0 || itemStep <= 0) return;
 
-    let from = offsetRef.current;
+    let from = stopManualTransition();
     if (direction < 0 && from < itemStep) from += cycleWidth;
     const to = from + direction * itemStep;
-    const duration = 460;
-    if (manualTimeoutRef.current !== null) window.clearTimeout(manualTimeoutRef.current);
-    track.style.transition = `transform ${duration}ms var(--ease)`;
+    track.style.transition = `transform ${MANUAL_STEP_DURATION_MS}ms var(--ease)`;
     applyTrackOffset(to, false);
-    manualUntilRef.current = performance.now() + duration;
+    manualUntilRef.current = performance.now() + MANUAL_STEP_DURATION_MS;
     manualTimeoutRef.current = window.setTimeout(() => {
       track.style.transition = 'none';
       applyTrackOffset(to);
       manualUntilRef.current = 0;
+      manualTimeoutRef.current = null;
       window.requestAnimationFrame(() => {
         if (previewTrackRef.current === track) track.style.transition = '';
       });
-    }, duration + 20);
-  }, [applyTrackOffset]);
+    }, MANUAL_STEP_DURATION_MS + 20);
+  }, [applyTrackOffset, stopManualTransition]);
 
   React.useEffect(() => {
     const frame = previewFrameRef.current;
@@ -85,49 +107,59 @@ export function Hero(): React.ReactElement {
     return () => {
       observer?.disconnect();
       window.cancelAnimationFrame(animationFrame);
-      if (manualTimeoutRef.current !== null) window.clearTimeout(manualTimeoutRef.current);
+      if (manualTimeoutRef.current !== null) {
+        window.clearTimeout(manualTimeoutRef.current);
+        manualTimeoutRef.current = null;
+      }
       track.classList.remove('is-controlled');
       track.style.transition = '';
     };
   }, [applyTrackOffset]);
 
   const onPreviewPointerDown = (event: React.PointerEvent<HTMLDivElement>): void => {
-    if (event.pointerType !== 'mouse' || event.button !== 0) return;
-    const frame = previewFrameRef.current;
-    if (!frame) return;
-    pointerSessionRef.current = { pointerId: event.pointerId, startX: event.clientX, startOffset: offsetRef.current, moved: false };
-    frame.setPointerCapture(event.pointerId);
+    if (!event.isPrimary || event.button !== 0 || !previewFrameRef.current) return;
+    if (event.pointerType === 'mouse') event.preventDefault();
+    pointerSessionRef.current = { pointerId: event.pointerId, startX: event.clientX, startOffset: stopManualTransition(), moved: false };
   };
 
-  const onPreviewPointerMove = (event: React.PointerEvent<HTMLDivElement>): void => {
+  const onWindowPointerMove = React.useCallback((event: PointerEvent): void => {
     const session = pointerSessionRef.current;
     if (!session || session.pointerId !== event.pointerId) return;
     const delta = event.clientX - session.startX;
-    if (Math.abs(delta) > 6) session.moved = true;
+    if (Math.abs(delta) > DRAG_THRESHOLD_PX) session.moved = true;
     if (session.moved) applyTrackOffset(session.startOffset - delta);
-  };
+  }, [applyTrackOffset]);
 
-  const onPreviewPointerUp = (event: React.PointerEvent<HTMLDivElement>): void => {
+  const finishPointerSession = React.useCallback((event: PointerEvent, cancelled = false): void => {
     const session = pointerSessionRef.current;
     if (!session || session.pointerId !== event.pointerId) return;
     const frame = previewFrameRef.current;
     pointerSessionRef.current = null;
-    if (frame?.hasPointerCapture(event.pointerId)) frame.releasePointerCapture(event.pointerId);
+    if (cancelled) {
+      manualUntilRef.current = performance.now() + 180;
+      return;
+    }
     if (!session.moved && frame) {
       const rect = frame.getBoundingClientRect();
-      moveBy(event.clientX < rect.left + rect.width / 2 ? -1 : 1);
+      const inside = event.clientX >= rect.left && event.clientX <= rect.right && event.clientY >= rect.top && event.clientY <= rect.bottom;
+      if (inside) moveBy(event.clientX < rect.left + rect.width / 2 ? -1 : 1);
     } else {
       manualUntilRef.current = performance.now() + 180;
     }
-  };
+  }, [moveBy]);
 
-  const onPreviewPointerCancel = (event: React.PointerEvent<HTMLDivElement>): void => {
-    const session = pointerSessionRef.current;
-    if (!session || session.pointerId !== event.pointerId) return;
-    pointerSessionRef.current = null;
-    manualUntilRef.current = performance.now() + 180;
-    if (previewFrameRef.current?.hasPointerCapture(event.pointerId)) previewFrameRef.current.releasePointerCapture(event.pointerId);
-  };
+  React.useEffect(() => {
+    const onPointerUp = (event: PointerEvent): void => finishPointerSession(event);
+    const onPointerCancel = (event: PointerEvent): void => finishPointerSession(event, true);
+    window.addEventListener('pointermove', onWindowPointerMove, { passive: true });
+    window.addEventListener('pointerup', onPointerUp);
+    window.addEventListener('pointercancel', onPointerCancel);
+    return () => {
+      window.removeEventListener('pointermove', onWindowPointerMove);
+      window.removeEventListener('pointerup', onPointerUp);
+      window.removeEventListener('pointercancel', onPointerCancel);
+    };
+  }, [finishPointerSession, onWindowPointerMove]);
 
   const onPreviewKeyDown = (event: React.KeyboardEvent<HTMLDivElement>): void => {
     if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
@@ -168,18 +200,16 @@ export function Hero(): React.ReactElement {
           tabIndex={0}
           aria-label="Листать кейсы"
           onPointerDown={onPreviewPointerDown}
-          onPointerMove={onPreviewPointerMove}
-          onPointerUp={onPreviewPointerUp}
-          onPointerCancel={onPreviewPointerCancel}
           onKeyDown={onPreviewKeyDown}
           onClick={onPreviewFrameClick}
+          onDragStart={event => event.preventDefault()}
         >
           <div className="hero-preview__track" ref={previewTrackRef}>
             {previewProjects.map((project, index) => {
               const duplicate = index >= projects.length;
               const responsiveImage = project.image.replace('.webp', '-700.webp');
               return <div className="hero-preview__shot" aria-hidden={duplicate || undefined} key={`${project.id}-${duplicate ? 'copy' : 'base'}`}>
-                <img src={project.image} srcSet={`${responsiveImage} 700w, ${project.image} 1400w`} sizes="(max-width: 809px) 70vw, 31vw" width="1400" height="795" alt={duplicate ? '' : project.alt} loading={index < 3 ? 'eager' : 'lazy'} decoding="async" />
+                <img src={project.image} srcSet={`${responsiveImage} 700w, ${project.image} 1400w`} sizes="(max-width: 809px) 70vw, 31vw" width="1400" height="795" alt={duplicate ? '' : project.alt} loading={index < 3 ? 'eager' : 'lazy'} decoding="async" draggable={false} />
               </div>;
             })}
           </div>
