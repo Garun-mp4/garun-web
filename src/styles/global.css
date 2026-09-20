@@ -156,9 +156,9 @@ button, a { -webkit-tap-highlight-color: transparent; }
 @keyframes hero-action { to { opacity: 1; transform: translateY(0); } }
 .hero-preview { grid-column: 3; align-self: end; width: 100%; max-width: 640px; justify-self: end; color: inherit; text-decoration: none; opacity: .001; transform: translateY(40px); animation: hero-preview-in .5s .8s var(--ease) forwards; }
 @keyframes hero-preview-in { to { opacity: 1; transform: translateY(0); } }
-.hero-preview__frame { --hero-shot-width: clamp(106px, 15vw, 210px); padding: 4px; background: var(--c-black); border-radius: 8px; overflow: hidden; }
-.hero-preview__track { display: flex; width: max-content; transform: translate3d(0, 0, 0); animation: hero-preview-marquee 42s linear infinite; will-change: transform; }
-.hero-preview__shot { flex: 0 0 var(--hero-shot-width); width: var(--hero-shot-width); margin-right: 4px; aspect-ratio: 1.5; border-radius: 4px; overflow: hidden; background: #222; }
+.hero-preview__frame { --hero-shot-width: calc(100% - 8px); aspect-ratio: 16 / 9; padding: 4px; background: var(--c-black); border-radius: 8px; overflow: hidden; }
+.hero-preview__track { display: flex; width: max-content; height: 100%; transform: translate3d(0, 0, 0); animation: hero-preview-marquee 42s linear infinite; will-change: transform; }
+.hero-preview__shot { flex: 0 0 var(--hero-shot-width); width: var(--hero-shot-width); height: 100%; margin-right: 4px; border-radius: 4px; overflow: hidden; background: #222; }
 .hero-preview__shot img { width: 100%; height: 100%; object-fit: cover; }
 @keyframes hero-preview-marquee { to { transform: translate3d(-50%, 0, 0); } }
 .hero-preview:hover .hero-preview__track,

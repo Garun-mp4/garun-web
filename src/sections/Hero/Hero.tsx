@@ -12,7 +12,7 @@ export function Hero(): React.ReactElement {
     if (!frame) return undefined;
 
     const syncShotWidth = (): void => {
-      frame.style.setProperty('--hero-shot-width', `${Math.max(1, (frame.clientWidth - 12) / 2)}px`);
+      frame.style.setProperty('--hero-shot-width', `${Math.max(1, frame.clientWidth - 8)}px`);
     };
     syncShotWidth();
     const observer = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(syncShotWidth) : null;
@@ -47,7 +47,7 @@ export function Hero(): React.ReactElement {
               const duplicate = index >= projects.length;
               const responsiveImage = project.image.replace('.webp', '-700.webp');
               return <div className="hero-preview__shot" aria-hidden={duplicate || undefined} key={`${project.id}-${duplicate ? 'copy' : 'base'}`}>
-                <img src={project.image} srcSet={`${responsiveImage} 700w, ${project.image} 1400w`} sizes="(max-width: 809px) 32vw, 17vw" width="1400" height="795" alt={duplicate ? '' : project.alt} loading={index < 3 ? 'eager' : 'lazy'} decoding="async" />
+                <img src={project.image} srcSet={`${responsiveImage} 700w, ${project.image} 1400w`} sizes="(max-width: 809px) 70vw, 31vw" width="1400" height="795" alt={duplicate ? '' : project.alt} loading={index < 3 ? 'eager' : 'lazy'} decoding="async" />
               </div>;
             })}
           </div>

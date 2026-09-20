@@ -27,6 +27,11 @@ test('homepage interactions, featured projects, FAQ and contact route work', asy
   const heroPreview = page.locator('.hero-preview');
   const marqueeTrack = heroPreview.locator('.hero-preview__track');
   await expect(heroPreview.locator('.hero-preview__shot')).toHaveCount(18);
+  const previewRatio = await heroPreview.locator('.hero-preview__frame').evaluate(node => {
+    const rect = node.getBoundingClientRect();
+    return rect.width / rect.height;
+  });
+  expect(previewRatio).toBeCloseTo(16 / 9, 1);
   await expect(marqueeTrack).toHaveCSS('animation-name', 'hero-preview-marquee');
   await heroPreview.hover();
   await expect(marqueeTrack).toHaveCSS('animation-play-state', 'paused');
