@@ -2,7 +2,13 @@ import React from 'react';
 import { projects } from '../../data/projects.js';
 import { ExternalIcon } from '../../components/ui/Icons.js';
 
-export function Projects(): React.ReactElement {
+interface Props {
+  featuredOnly?: boolean;
+}
+
+export function Projects({ featuredOnly = false }: Props): React.ReactElement {
+  const visibleProjects = featuredOnly ? projects.slice(0, 6) : projects;
+
   return <section className="projects section-light" id="projects" aria-labelledby="projects-title">
     <div className="section-inner">
       <div className="projects__intro">
@@ -14,7 +20,7 @@ export function Projects(): React.ReactElement {
       </div>
 
       <div className="project-list">
-        {projects.map(project => <a className="project-row" href={project.url} target="_blank" rel="noopener noreferrer" key={project.id} data-cursor-label="ОТКРЫТЬ САЙТ">
+        {visibleProjects.map(project => <a className="project-row" href={project.url} target="_blank" rel="noopener noreferrer" key={project.id} data-cursor-label="ОТКРЫТЬ САЙТ">
           <span className="project-row__bg" aria-hidden="true"></span>
           <span className="project-row__meta"><small>CASE {project.index}</small><small>{project.category}</small></span>
           <span className="project-row__main">
@@ -25,6 +31,7 @@ export function Projects(): React.ReactElement {
           </span>
         </a>)}
       </div>
+      {featuredOnly ? <div className="projects__more"><a className="plain-action plain-action--outline" href="/projects">ВСЕ ПРОЕКТЫ <span aria-hidden="true">↗</span></a></div> : null}
     </div>
   </section>;
 }

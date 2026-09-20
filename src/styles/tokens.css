@@ -1,4 +1,5 @@
 :root {
+  /* Grigoletti-inspired primitive palette. Keep this small and intentional. */
   --c-black: #111111;
   --c-dark-subtle: #333333;
   --c-gray: #555555;
@@ -13,31 +14,48 @@
   --border-light: var(--c-muted);
   --border-dark: var(--c-gray);
 
-  --font-display: "Oswald", "Arial Narrow", "Roboto Condensed", "Liberation Sans Narrow", Impact, sans-serif;
-  --font-body: "Inter", Arial, sans-serif;
-  --font-mono: "Roboto Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
+  /* Licensed PP Neue faces can be placed before the legal fallbacks when available. */
+  --font-display: "PP Neue Corp Tight Ultrabold", "PP Neue Corp Tight Ultrabold Placeholder", "Oswald", "Arial Narrow", "Roboto Condensed", "Liberation Sans Narrow", Impact, sans-serif;
+  --font-body: "PP Neue Montreal Medium", "PP Neue Montreal Medium Placeholder", "Inter", Arial, sans-serif;
+  --font-mono: "PP Neue Montreal Mono Medium", "PP Neue Montreal Mono Medium Placeholder", "Roboto Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
+  --font-system: "Inter Variable", Inter, Arial, sans-serif;
 
   --gutter: 32px;
+  --gutter-page: var(--gutter);
   --radius-control: 4px;
   --radius-media: 8px;
   --radius-section: 8px;
+  --radius-thumb: 2px;
   --control-h: 44px;
+  --border-width: 1px;
+  --icon-stroke: 2px;
 
   --ease: cubic-bezier(.12,.23,.5,1);
   --duration-color: 300ms;
   --duration-enter: 500ms;
+  --motion-layer-offset: 8px;
+  --motion-layer-scale: .5;
 
   --fs-display: 100px;
   --fs-subdisplay: 64px;
+  --fs-heading-compact: 32px;
+  --fs-lead-xl: 32px;
   --fs-lead: 28px;
   --fs-body: 20px;
+  --lh-display: .8em;
+  --lh-hero: .9em;
+  --lh-lead: 1.2em;
+  --lh-body: 1.3em;
 }
 
 @media (max-width: 1199.98px) and (min-width: 810px) {
   :root {
     --gutter: 24px;
+    --gutter-page: var(--gutter);
     --fs-display: 80px;
     --fs-subdisplay: 56px;
+    --fs-heading-compact: 28px;
+    --fs-lead-xl: 28px;
     --fs-lead: 24px;
     --fs-body: 18px;
   }
@@ -46,8 +64,11 @@
 @media (max-width: 809.98px) {
   :root {
     --gutter: 16px;
+    --gutter-page: var(--gutter);
     --fs-display: 64px;
     --fs-subdisplay: 40px;
+    --fs-heading-compact: 24px;
+    --fs-lead-xl: 20px;
     --fs-lead: 20px;
     --fs-body: 16px;
   }

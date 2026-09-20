@@ -49,6 +49,15 @@ npm run dev
 
 Vite выведет локальный URL в терминале, обычно `http://localhost:5173`.
 
+Основные страницы:
+
+- `/` — главная с hero, featured-проектами, услугами, About, FAQ и CTA;
+- `/services` — полная страница услуг;
+- `/projects` — полный список проектов;
+- `/about` — страница «Обо мне»;
+- `/contact` — контактная форма;
+- `/calculator` — отдельный калькулятор оценки проекта.
+
 ## Production build
 
 ```bash
@@ -84,7 +93,7 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
-Unit-тесты проверяют формулы калькулятора и обязательную валидацию. Playwright smoke-тесты проверяют загрузку главной, Services dropdown, FAQ, все семь шагов калькулятора, mobile menu, contact overlay, project links и reduced-motion behavior.
+Unit-тесты проверяют формулы калькулятора и обязательную валидацию. Playwright smoke-тесты проверяют загрузку главной, Services dropdown, FAQ, все семь шагов калькулятора, mobile menu, contact page, project links и reduced-motion behavior.
 
 ## Environment variables
 
@@ -137,7 +146,7 @@ src/
     calculator/          config, types and pure pricing logic
     contact/             contact overlay
     cursor/              contextual custom cursor
-  sections/              Hero, Services, Projects, About, Values, Calculator, FAQ, CTA, Footer
+  sections/              Hero, Services, Projects, About, Values, Calculator, FAQ, CTA, Footer, Contact
   styles/                design tokens, typography, global component styles
   utils/                 lead submission and contact events
 tests/                   Vitest unit tests
@@ -148,8 +157,8 @@ e2e/                     Playwright smoke tests
 
 Референс использует коммерческие PP Neue Corp Tight / PP Neue Montreal / PP Neue Montreal Mono. Их лицензированные бинарники не входили в предоставленный проект, поэтому репозиторий не копирует и не hotlink-ит эти proprietary font files с чужого сайта. Сейчас используются легальные web-font fallbacks: Oswald, Inter и Roboto Mono, плюс системные condensed fallbacks для display-текста.
 
-Для максимальной pixel fidelity можно позже подключить собственные лицензированные WOFF2-файлы через font tokens в `src/styles/tokens.css` / `src/styles/typography.css`.
+Токены уже используют имена PP Neue первыми в font stack, поэтому собственные лицензированные WOFF2-файлы можно подключить без изменения компонентов через `src/styles/tokens.css` / `src/styles/typography.css`.
 
 ## Calculator note
 
-Вопросы, варианты ответов, цены, коэффициенты, discount, fast multiplier и формула диапазона перенесены из актуальной legacy-версии калькулятора без произвольного изменения pricing model. Отдельная presentation-классификация `Старт / Бизнес / Продажи+` в новой IA не используется; ориентировочный диапазон стоимости и отправка расчёта сохранены.
+Вопросы, варианты ответов, цены, коэффициенты, discount, fast multiplier и формула диапазона перенесены из актуальной legacy-версии калькулятора без произвольного изменения pricing model. Калькулятор доступен на отдельном `/calculator`, чтобы главная страница сохраняла компактную editorial-структуру референса. Отдельная presentation-классификация `Старт / Бизнес / Продажи+` в новой IA не используется; ориентировочный диапазон стоимости и отправка расчёта сохранены.

@@ -3,9 +3,10 @@
   font-family: var(--font-display);
   font-weight: 700;
   font-size: var(--fs-display);
-  line-height: .8;
-  letter-spacing: -.02em;
+  line-height: var(--lh-display);
+  letter-spacing: 0;
   text-transform: uppercase;
+  text-wrap: balance;
 }
 
 .display-title--light { color: var(--c-warm); }

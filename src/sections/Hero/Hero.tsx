@@ -1,6 +1,5 @@
 import React from 'react';
 import { LayerButton } from '../../components/ui/LayerButton.js';
-import { openContact } from '../../utils/contact.js';
 
 const words = 'Проектирую структуру, собираю frontend, адаптив и интерактив — от формы до квиза и калькулятора.'.split(' ');
 
@@ -18,8 +17,8 @@ export function Hero(): React.ReactElement {
           {words.map((word, index) => <span className="hero-word" style={{ animationDelay: `${0.28 + index * 0.018}s` }} key={`${word}-${index}`}>{word}&nbsp;</span>)}
         </p>
         <div className="hero__actions">
-          <LayerButton variant="dark" portrait onClick={() => openContact({ source: 'hero' })}>ОБСУДИТЬ ПРОЕКТ</LayerButton>
-          <LayerButton variant="outline" href="#projects">СМОТРЕТЬ ПРОЕКТЫ</LayerButton>
+          <LayerButton variant="dark" portrait href="/contact">ОБСУДИТЬ ПРОЕКТ</LayerButton>
+          <LayerButton variant="outline" href="/projects">СМОТРЕТЬ ПРОЕКТЫ</LayerButton>
         </div>
       </div>
 

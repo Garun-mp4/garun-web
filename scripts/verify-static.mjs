@@ -58,6 +58,7 @@ for (const required of [
   'index.html',
   'src/main.tsx',
   'api/send-lead.js',
+  'src/sections/Contact/ContactPage.tsx',
   'public/privacy.html',
   'public/robots.txt',
   'public/sitemap.xml',

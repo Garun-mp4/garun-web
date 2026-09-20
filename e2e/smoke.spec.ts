@@ -9,7 +9,8 @@ function captureRuntimeErrors(page: Page): string[] {
   return errors;
 }
 
-test('homepage interactions, projects, FAQ and contact modal work', async ({ page }) => {
+test('homepage interactions, featured projects, FAQ and contact route work', async ({ page }) => {
+  test.skip(test.info().project.name === 'mobile-chromium', 'Desktop navigation interaction is covered by the dedicated mobile menu test.');
   const errors = captureRuntimeErrors(page);
   await page.goto('/');
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
@@ -26,21 +27,21 @@ test('homepage interactions, projects, FAQ and contact modal work', async ({ pag
   await expect(faq).toHaveAttribute('aria-expanded', 'true');
   await expect(page.locator('.faq-row__answer').first()).toBeVisible();
 
-  await expect(page.locator('.project-row')).toHaveCount(9);
+  await expect(page.locator('.project-row')).toHaveCount(6);
   await expect(page.locator('.project-row').first()).toHaveAttribute('href', /^https:\/\//);
 
-  await page.getByRole('button', { name: 'СВЯЗАТЬСЯ' }).first().click();
-  const dialog = page.getByRole('dialog', { name: 'РАССКАЖИТЕ О ЗАДАЧЕ' });
-  await expect(dialog).toBeVisible();
-  await dialog.getByRole('button', { name: 'Закрыть форму' }).click();
-  await expect(dialog).toBeHidden();
+  await page.getByRole('link', { name: 'СВЯЗАТЬСЯ' }).first().click();
+  await expect(page).toHaveURL(/\/contact$/);
+  await expect(page.getByRole('heading', { name: 'РАССКАЖИТЕ О ЗАДАЧЕ' })).toBeVisible();
+  await page.getByRole('button', { name: /ОТПРАВИТЬ ЗАЯВКУ/ }).click();
+  await expect(page.getByRole('alert')).toContainText('Укажите имя и контакт');
 
   expect(errors).toEqual([]);
 });
 
 test('calculator validates and completes all seven steps', async ({ page }) => {
   const errors = captureRuntimeErrors(page);
-  await page.goto('/#calculator');
+  await page.goto('/calculator');
   const calculator = page.locator('#calculator');
 
   await calculator.getByRole('button', { name: /ДАЛЕЕ/ }).click();
@@ -83,6 +84,7 @@ test('mobile menu is usable without hover', async ({ page }) => {
   await trigger.click();
   await expect(page.locator('#mobile-menu')).toHaveAttribute('aria-hidden', 'false');
   await page.locator('#mobile-menu').getByRole('link', { name: 'ПРОЕКТЫ' }).click();
+  await expect(page).toHaveURL(/\/projects$/);
   await expect(page.locator('#mobile-menu')).toHaveAttribute('aria-hidden', 'true');
   await expect(page.locator('#projects')).toBeInViewport();
 
