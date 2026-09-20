@@ -251,6 +251,29 @@ test('mobile header hides with a gradual fade and slide', async ({ page }) => {
 
   expect(transition.transform).toBeGreaterThanOrEqual(0.7);
   expect(transition.opacity).toBeGreaterThanOrEqual(0.5);
+
+  await page.mouse.wheel(0, 320);
+  await expect(page.locator('.site-header')).toHaveClass(/is-hidden/);
+  await expect.poll(async () => page.locator('.mobile-header-actions').evaluate(element => {
+    const style = element.ownerDocument.defaultView?.getComputedStyle(element);
+    if (!style) throw new Error('Could not read mobile header opacity');
+    return style.opacity;
+  })).toBe('0');
+  const motionState = await page.locator('.mobile-header-actions').evaluate(element => {
+    const view = element.ownerDocument.defaultView;
+    const style = view?.getComputedStyle(element);
+    const inner = element.querySelector('.mobile-header-actions__inner');
+    const innerStyle = inner && view ? view.getComputedStyle(inner) : null;
+    if (!style || !innerStyle) throw new Error('Could not read mobile header animation styles');
+    return {
+      parentAnimation: style.animationName,
+      parentOpacity: style.opacity,
+      innerAnimation: innerStyle.animationName,
+    };
+  });
+  expect(motionState.parentAnimation).toBe('none');
+  expect(motionState.parentOpacity).toBe('0');
+  expect(motionState.innerAnimation).toBe('header-control-in');
 });
 
 test('responsive headings stay inside the viewport on every route', async ({ page }) => {

@@ -126,10 +126,12 @@ export class Header extends React.Component<Record<string, never>, State> {
       </div>
 
       <div className="mobile-header-actions">
-        <LayerButton href="/contact" variant={this.state.inverse ? 'light' : 'dark'} portrait>КОНТАКТ</LayerButton>
-        <button className="mobile-menu-trigger" type="button" aria-label={this.state.menuOpen ? 'Закрыть меню' : 'Открыть меню'} aria-expanded={this.state.menuOpen} aria-controls="mobile-menu" onClick={this.toggleMenu}>
-          <span>МЕНЮ</span><MenuIcon open={this.state.menuOpen} />
-        </button>
+        <div className="mobile-header-actions__inner">
+          <LayerButton href="/contact" variant={this.state.inverse ? 'light' : 'dark'} portrait>КОНТАКТ</LayerButton>
+          <button className="mobile-menu-trigger" type="button" aria-label={this.state.menuOpen ? 'Закрыть меню' : 'Открыть меню'} aria-expanded={this.state.menuOpen} aria-controls="mobile-menu" onClick={this.toggleMenu}>
+            <span>МЕНЮ</span><MenuIcon open={this.state.menuOpen} />
+          </button>
+        </div>
       </div>
 
       <div className={`mobile-menu-overlay${this.state.menuOpen ? ' is-open' : ''}`} id="mobile-menu" aria-hidden={!this.state.menuOpen}>
