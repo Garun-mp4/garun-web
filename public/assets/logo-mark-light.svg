@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" role="img" aria-labelledby="title desc">
+  <title id="title">Логотип LP светлый</title>
+  <desc id="desc">Светлая версия минималистичного монограмного логотипа.</desc>
+  <g fill="#FFF8ED">
+    <path d="M20 20H40V120H80V140H20Z"/>
+    <path d="M83 50H115C139 50 158 68 158 92C158 116 139 134 115 134H103V158H83V50ZM103 70V114H115C128 114 138 104 138 92C138 80 128 70 115 70H103Z"/>
+  </g>
+</svg>

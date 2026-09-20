@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://garun-landings.vercel.app/sitemap.xml

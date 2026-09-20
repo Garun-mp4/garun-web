@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">LP</title>
+  <g fill="#101418">
+    <path d="M8 8h7v41h15v7H8Z"/>
+    <path d="M31 18h12.5c6.9 0 12.5 5.6 12.5 12.5S50.4 43 43.5 43H38v13H31Zm7 7v11h5.5a5.5 5.5 0 0 0 0-11Z"/>
+  </g>
+</svg>

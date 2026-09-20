@@ -1,0 +1,54 @@
+:root {
+  --c-black: #111111;
+  --c-dark-subtle: #333333;
+  --c-gray: #555555;
+  --c-muted: #aaaaaa;
+  --c-label: #dbdbdb;
+  --c-warm: #ebe9e4;
+  --c-orange: #ff4c24;
+
+  --bg: var(--c-warm);
+  --fg: var(--c-black);
+  --muted: var(--c-gray);
+  --border-light: var(--c-muted);
+  --border-dark: var(--c-gray);
+
+  --font-display: "Oswald", "Arial Narrow", "Roboto Condensed", "Liberation Sans Narrow", Impact, sans-serif;
+  --font-body: "Inter", Arial, sans-serif;
+  --font-mono: "Roboto Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
+
+  --gutter: 32px;
+  --radius-control: 4px;
+  --radius-media: 8px;
+  --radius-section: 8px;
+  --control-h: 44px;
+
+  --ease: cubic-bezier(.12,.23,.5,1);
+  --duration-color: 300ms;
+  --duration-enter: 500ms;
+
+  --fs-display: 100px;
+  --fs-subdisplay: 64px;
+  --fs-lead: 28px;
+  --fs-body: 20px;
+}
+
+@media (max-width: 1199.98px) and (min-width: 810px) {
+  :root {
+    --gutter: 24px;
+    --fs-display: 80px;
+    --fs-subdisplay: 56px;
+    --fs-lead: 24px;
+    --fs-body: 18px;
+  }
+}
+
+@media (max-width: 809.98px) {
+  :root {
+    --gutter: 16px;
+    --fs-display: 64px;
+    --fs-subdisplay: 40px;
+    --fs-lead: 20px;
+    --fs-body: 16px;
+  }
+}

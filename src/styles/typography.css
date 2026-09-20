@@ -1,0 +1,25 @@
+.display-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--fs-display);
+  line-height: .8;
+  letter-spacing: -.02em;
+  text-transform: uppercase;
+}
+
+.display-title--light { color: var(--c-warm); }
+
+.label {
+  display: inline-flex;
+  width: max-content;
+  padding: 5px 8px 4px;
+  border-radius: var(--radius-control);
+  background: var(--c-label);
+  color: var(--c-black);
+  font: 700 16px/1 var(--font-display);
+  letter-spacing: .02em;
+  text-transform: uppercase;
+}
+
+.label--dark { background: var(--c-dark-subtle); color: var(--c-warm); }
