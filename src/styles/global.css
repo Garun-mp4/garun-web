@@ -486,6 +486,8 @@ button, a { -webkit-tap-highlight-color: transparent; }
 @media (max-width: 809.98px) {
   .desktop-nav, .desktop-only { display: none !important; }
   .brand-mark { top: 18px; left: 16px; width: 40px; height: 40px; }
+  .brand-mark,
+  .mobile-header-actions { transition: transform .72s var(--ease), opacity .58s var(--ease); }
   .mobile-header-actions { position: fixed; z-index: 31; top: 16px; right: 16px; display: flex; align-items: stretch; gap: 6px; animation: header-control-in .55s .1s var(--ease) both; }
   .mobile-header-actions .layer-button { height: 44px; }
   .mobile-menu-trigger { position: relative; height: 44px; padding: 0 13px; display: flex; align-items: center; gap: 0; border: 1px solid var(--c-black); border-radius: 4px; background: var(--c-warm); color: var(--c-black); font: 700 18px/1 var(--font-display); }

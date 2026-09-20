@@ -237,6 +237,22 @@ test('header hides by direction and hero sinks while scrolling', async ({ page }
   await expect(page.locator('.hero')).not.toHaveClass(/is-sunk/);
 });
 
+test('mobile header hides with a gradual fade and slide', async ({ page }) => {
+  test.skip(test.info().project.name !== 'mobile-chromium', 'The mobile header motion is covered by the mobile project.');
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+
+  const transition = await page.locator('.mobile-header-actions').evaluate(element => {
+    const style = element.ownerDocument.defaultView?.getComputedStyle(element);
+    if (!style) throw new Error('Could not read mobile header transition styles');
+    const durations = style.transitionDuration.split(',').map((value: string) => Number.parseFloat(value));
+    return { transform: durations[0], opacity: durations[1] };
+  });
+
+  expect(transition.transform).toBeGreaterThanOrEqual(0.7);
+  expect(transition.opacity).toBeGreaterThanOrEqual(0.5);
+});
+
 test('responsive headings stay inside the viewport on every route', async ({ page }) => {
   const routes = ['/', '/services', '/projects', '/about', '/contact', '/calculator', '/unknown', '/privacy.html'];
   const viewports = [
