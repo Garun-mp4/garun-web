@@ -97,7 +97,8 @@ export function App(): React.ReactElement {
       } else if (hashTarget) {
         hashTarget.scrollIntoView({ block: 'start' });
       } else if (lenis) {
-        lenis.scrollTo(0, { immediate: true });
+        const hasPendingScroll = window.scrollY > 0 || lenis.isScrolling || Math.abs(lenis.targetScroll) > 0.5;
+        if (!hasPendingScroll) lenis.scrollTo(0, { immediate: true });
       } else {
         window.scrollTo(0, 0);
       }

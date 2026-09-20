@@ -81,6 +81,20 @@ test('homepage interactions, featured projects, FAQ and contact route work', asy
   expect(errors).toEqual([]);
 });
 
+test('all client routes can be opened directly', async ({ page }) => {
+  for (const route of ['/services', '/projects', '/about', '/contact', '/calculator', '/unknown']) {
+    const response = await page.goto(route);
+    expect(response?.status(), `Expected ${route} to return the SPA shell`).toBe(200);
+    await expect(page.locator('main#main')).toBeVisible();
+    const canonical = await page.locator('link[rel="canonical"]').getAttribute('href');
+    expect(canonical).not.toBeNull();
+    if (!canonical) throw new Error(`Canonical URL is missing for ${route}`);
+    const canonicalUrl = new URL(canonical, page.url());
+    expect(canonicalUrl.origin).toBe(new URL(page.url()).origin);
+    expect(canonicalUrl.pathname).toBe(route);
+  }
+});
+
 test('calculator validates and completes all seven steps', async ({ page }) => {
   const errors = captureRuntimeErrors(page);
   await page.goto('/calculator');

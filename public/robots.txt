@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://garun-landings.vercel.app/sitemap.xml
+Sitemap: https://garun-web.vercel.app/sitemap.xml

@@ -130,7 +130,7 @@ Serverless function находится в `api/send-lead.js`. Frontend отпр�
 5. Добавьте Telegram environment variables.
 6. Deploy.
 
-`vercel.json` не переписывает `/api/*`, поэтому serverless function остаётся доступной. Политика конфиденциальности публикуется как `/privacy.html` (при `cleanUrls` также может быть доступна без расширения).
+`vercel.json` отдаёт все клиентские маршруты через SPA fallback и не переписывает существующие `/api/*` и статические файлы. Политика конфиденциальности публикуется как `/privacy` (исходный файл — `public/privacy.html`). Внутренние ссылки и metadata не привязаны к конкретному домену.
 
 ## Structure
 

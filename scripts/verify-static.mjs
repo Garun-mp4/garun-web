@@ -32,6 +32,10 @@ async function walk(relativeDir) {
 }
 
 const packageJson = JSON.parse(await readFile(path.join(root, 'package.json'), 'utf8'));
+const vercelConfig = JSON.parse(await readFile(path.join(root, 'vercel.json'), 'utf8'));
+const spaRewrite = vercelConfig.rewrites?.find(rewrite => rewrite?.source === '/(.*)');
+if (!spaRewrite) fail('vercel.json must contain a catch-all SPA rewrite from /(.*).');
+else if (vercelConfig.cleanUrls && /\.html(?:$|[?#])/.test(spaRewrite.destination ?? '')) fail('The SPA rewrite destination must not include .html when cleanUrls is enabled.');
 const expectedVersions = {
   react: '19.3.0',
   'react-dom': '19.3.0',
@@ -56,6 +60,7 @@ if (packageJson.engines?.node !== '^20.19.0 || >=22.12.0') fail('Node engine mus
 
 for (const required of [
   'index.html',
+  'vercel.json',
   'src/main.tsx',
   'api/send-lead.js',
   'src/sections/Contact/ContactPage.tsx',
