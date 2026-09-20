@@ -1,9 +1,27 @@
 import React from 'react';
 import { LayerButton } from '../../components/ui/LayerButton.js';
+import { projects } from '../../data/projects.js';
 
 const words = 'Проектирую структуру, собираю frontend, адаптив и интерактив — от формы до квиза и калькулятора.'.split(' ');
 
 export function Hero(): React.ReactElement {
+  const previewFrameRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    const frame = previewFrameRef.current;
+    if (!frame) return undefined;
+
+    const syncShotWidth = (): void => {
+      frame.style.setProperty('--hero-shot-width', `${Math.max(1, (frame.clientWidth - 12) / 2)}px`);
+    };
+    syncShotWidth();
+    const observer = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(syncShotWidth) : null;
+    observer?.observe(frame);
+    return () => observer?.disconnect();
+  }, []);
+
+  const previewProjects = [...projects, ...projects];
+
   return <section className="hero" id="top" aria-labelledby="hero-title">
     <div className="hero__grid">
       <h1 className="hero__title" id="hero-title">
@@ -23,9 +41,16 @@ export function Hero(): React.ReactElement {
       </div>
 
       <a className="hero-preview" href="#projects" aria-label="Перейти к проектам">
-        <div className="hero-preview__frame">
-          <div className="hero-preview__shot"><img src="/images/cases/velora.webp" srcSet="/images/cases/velora-700.webp 700w, /images/cases/velora.webp 1400w" sizes="(max-width: 809px) 41vw, 320px" width="1400" height="795" alt="Превью проекта VELORA" decoding="async" /></div>
-          <div className="hero-preview__shot"><img src="/images/cases/forma-remonta.webp" srcSet="/images/cases/forma-remonta-700.webp 700w, /images/cases/forma-remonta.webp 1400w" sizes="(max-width: 809px) 41vw, 320px" width="1400" height="795" alt="Превью проекта Forma ремонта" decoding="async" /></div>
+        <div className="hero-preview__frame" ref={previewFrameRef}>
+          <div className="hero-preview__track">
+            {previewProjects.map((project, index) => {
+              const duplicate = index >= projects.length;
+              const responsiveImage = project.image.replace('.webp', '-700.webp');
+              return <div className="hero-preview__shot" aria-hidden={duplicate || undefined} key={`${project.id}-${duplicate ? 'copy' : 'base'}`}>
+                <img src={project.image} srcSet={`${responsiveImage} 700w, ${project.image} 1400w`} sizes="(max-width: 809px) 32vw, 17vw" width="1400" height="795" alt={duplicate ? '' : project.alt} loading={index < 3 ? 'eager' : 'lazy'} decoding="async" />
+              </div>;
+            })}
+          </div>
         </div>
         <div className="hero-preview__caption"><span>ПРОЕКТЫ</span><i></i><span>GARUN / FRONTEND</span></div>
       </a>

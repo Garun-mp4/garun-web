@@ -22,6 +22,13 @@ test('homepage interactions, featured projects, FAQ and contact route work', asy
   await page.keyboard.press('Escape');
   await expect(servicesTrigger).toHaveAttribute('aria-expanded', 'false');
 
+  const heroPreview = page.locator('.hero-preview');
+  const marqueeTrack = heroPreview.locator('.hero-preview__track');
+  await expect(heroPreview.locator('.hero-preview__shot')).toHaveCount(18);
+  await expect(marqueeTrack).toHaveCSS('animation-name', 'hero-preview-marquee');
+  await heroPreview.hover();
+  await expect(marqueeTrack).toHaveCSS('animation-play-state', 'paused');
+
   const faq = page.locator('.faq-row > button').first();
   await faq.click();
   await expect(faq).toHaveAttribute('aria-expanded', 'true');
@@ -97,5 +104,6 @@ test('reduced-motion mode disables the custom cursor and scroll scale animation'
   await page.goto('/#about');
   await expect(page.locator('.custom-cursor')).toHaveCount(0);
   await expect(page.locator('.about-frame')).toHaveCSS('transform', 'none');
+  await expect(page.locator('.hero-preview__track')).toHaveCSS('animation-name', 'none');
   expect(errors).toEqual([]);
 });
