@@ -9,6 +9,18 @@ function captureRuntimeErrors(page: Page): string[] {
   return errors;
 }
 
+interface ResponsiveLayout {
+  viewportWidth: number;
+  documentWidth: number;
+  problems: Array<{
+    text: string;
+    right: number;
+    left: number;
+    scrollWidth: number;
+    clientWidth: number;
+  }>;
+}
+
 test('homepage interactions, featured projects, FAQ and contact route work', async ({ page }) => {
   test.skip(test.info().project.name === 'mobile-chromium', 'Desktop navigation interaction is covered by the dedicated mobile menu test.');
   const errors = captureRuntimeErrors(page);
@@ -104,6 +116,49 @@ test('privacy policy uses the same smooth-scroll runtime', async ({ page }) => {
   await expect(page.locator('html')).toHaveClass(/lenis-autoToggle/);
   await expect(page.locator('html')).toHaveCSS('scroll-behavior', 'auto');
   expect(errors).toEqual([]);
+});
+
+test('responsive headings stay inside the viewport on every route', async ({ page }) => {
+  const routes = ['/', '/services', '/projects', '/about', '/contact', '/calculator', '/unknown', '/privacy.html'];
+  const viewports = [
+    { width: 1280, height: 800 },
+    { width: 390, height: 844 },
+    { width: 320, height: 700 },
+  ];
+
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+
+  for (const viewport of viewports) {
+    await page.setViewportSize(viewport);
+
+    for (const route of routes) {
+      await page.goto(route);
+      await page.evaluate('document.fonts.ready');
+
+      const layout = await page.evaluate<ResponsiveLayout>(`(() => {
+        const viewportWidth = document.documentElement.clientWidth;
+        const problems = [...document.querySelectorAll('h1, h2, h3, .hero-line > span')]
+          .map(element => {
+            const rect = element.getBoundingClientRect();
+            return {
+              text: (element.textContent || '').replace(/\\s+/g, ' ').trim().slice(0, 60),
+              right: rect.right,
+              left: rect.left,
+              scrollWidth: element.scrollWidth,
+              clientWidth: element.clientWidth,
+            };
+          })
+          .filter(({ right, left, scrollWidth, clientWidth }) => (
+            left < -1 || right > viewportWidth + 1 || scrollWidth > clientWidth + 1
+          ));
+
+        return { viewportWidth, documentWidth: document.documentElement.scrollWidth, problems };
+      })()`);
+
+      expect(layout.documentWidth, `${route} at ${viewport.width}px creates horizontal overflow`).toBeLessThanOrEqual(layout.viewportWidth + 1);
+      expect(layout.problems, `${route} at ${viewport.width}px has clipped or overflowing typography`).toEqual([]);
+    }
+  }
 });
 
 test('calculator validates and completes all seven steps', async ({ page }) => {
