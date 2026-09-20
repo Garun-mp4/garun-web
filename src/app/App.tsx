@@ -12,6 +12,7 @@ import { Footer } from '../sections/Footer/Footer.js';
 import { ContactPage } from '../sections/Contact/ContactPage.js';
 import { ContactModal } from '../features/contact/ContactModal.js';
 import { CustomCursor } from '../features/cursor/CustomCursor.js';
+import { getSmoothScroll, SmoothScroll } from '../features/scroll/SmoothScroll.js';
 
 type RoutePath = '/' | '/services' | '/projects' | '/about' | '/contact' | '/calculator' | '/404';
 
@@ -79,15 +80,35 @@ export function App(): React.ReactElement {
       '/404': 'Страница не найдена — Гарун / Frontend',
     };
     document.title = titles[route];
-    const hashTarget = window.location.hash ? document.querySelector(window.location.hash) : null;
-    if (hashTarget) {
-      window.requestAnimationFrame(() => hashTarget.scrollIntoView({ block: 'start' }));
-    } else {
-      window.scrollTo(0, 0);
-    }
+    let cancelled = false;
+    const scrollAfterLayout = async (): Promise<void> => {
+      await document.fonts.ready;
+      await new Promise<void>(resolve => {
+        window.requestAnimationFrame(() => window.requestAnimationFrame(() => resolve()));
+      });
+      if (cancelled) return;
+
+      const hash = window.location.hash.slice(1);
+      const hashTarget = hash ? document.getElementById(decodeURIComponent(hash)) : null;
+      const lenis = getSmoothScroll();
+
+      if (hashTarget && lenis) {
+        lenis.scrollTo(hashTarget);
+      } else if (hashTarget) {
+        hashTarget.scrollIntoView({ block: 'start' });
+      } else if (lenis) {
+        lenis.scrollTo(0, { immediate: true });
+      } else {
+        window.scrollTo(0, 0);
+      }
+    };
+    void scrollAfterLayout();
+
+    return () => { cancelled = true; };
   }, [route]);
 
   return <div className="app-shell">
+    <SmoothScroll />
     <a className="skip-link" href="#main">Перейти к содержимому</a>
     <Header />
     <RouteView route={route} />

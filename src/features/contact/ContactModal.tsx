@@ -82,7 +82,7 @@ export class ContactModal extends React.Component<Record<string, never>, State> 
     if (!this.state.open) return null;
     return <div className="contact-modal" role="presentation">
       <button className="contact-modal__backdrop" type="button" tabIndex={-1} aria-label="Закрыть форму" onClick={this.close}></button>
-      <div className="contact-modal__dialog" ref={this.dialogRef} role="dialog" aria-modal="true" aria-labelledby="contact-dialog-title">
+      <div className="contact-modal__dialog" ref={this.dialogRef} role="dialog" aria-modal="true" aria-labelledby="contact-dialog-title" data-lenis-prevent>
         <div className="contact-modal__head">
           <span className="label">ЗАЯВКА</span>
           <button type="button" className="contact-modal__close" onClick={this.close} aria-label="Закрыть форму">×</button>

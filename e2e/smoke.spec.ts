@@ -14,6 +14,8 @@ test('homepage interactions, featured projects, FAQ and contact route work', asy
   const errors = captureRuntimeErrors(page);
   await page.goto('/');
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+  await expect(page.locator('html')).toHaveClass(/lenis-autoToggle/);
+  await expect(page.locator('html')).toHaveCSS('scroll-behavior', 'auto');
 
   const servicesTrigger = page.getByRole('button', { name: 'Открыть список услуг' });
   await servicesTrigger.click();
@@ -28,6 +30,8 @@ test('homepage interactions, featured projects, FAQ and contact route work', asy
   await expect(marqueeTrack).toHaveCSS('animation-name', 'hero-preview-marquee');
   await heroPreview.hover();
   await expect(marqueeTrack).toHaveCSS('animation-play-state', 'paused');
+  await page.getByRole('link', { name: 'Перейти к проектам' }).click();
+  await expect(page.locator('#projects')).toBeInViewport();
 
   const faq = page.locator('.faq-row > button').first();
   await faq.click();
