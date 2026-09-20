@@ -12,7 +12,7 @@ interface Props {
 }
 
 export function LayerButton({ href, children, variant = 'outline', portrait = false, external = false, onClick, className = '', ariaLabel }: Props): React.ReactElement {
-  const renderPortrait = () => portrait ? <img src="/images/portrait/hero-img-soft.webp" alt="" width="28" height="28" decoding="async" /> : null;
+  const renderPortrait = () => portrait ? <img src="/images/portrait/portrait-button.webp" alt="" width="28" height="28" decoding="async" /> : null;
   const content = <span className="layer-button__stage">
     <span className="layer-button__sizer" aria-hidden="true">{renderPortrait()}<span>{children}</span></span>
     <span className="layer-button__layer layer-button__layer--base">{renderPortrait()}<span>{children}</span></span>

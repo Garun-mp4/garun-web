@@ -39,7 +39,7 @@
 - Реализованы reference-like sticky Services, row-based Projects, contextual custom cursor, sticky/scale About, scroll-active Values, ruled FAQ, compact contact overlay и viewport CTA.
 - Fixed header адаптирует logo/contact control над тёмными секциями.
 - Все 9 реальных проектов и внешние ссылки сохранены.
-- Основной portrait использует существующий `hero-img-soft`.
+- Портрет заменён на предоставленное изображение с зелёным фоном. Для разных размеров добавлены `portrait-about.webp` (768px), `portrait-about-384.webp` (responsive-вариант) и `portrait-button.webp` (96px для CTA-кнопок); прежний `hero-img-soft.webp` удалён как неиспользуемый.
 - Case screenshots конвертированы в WebP и имеют responsive варианты.
 - Добавлены SEO/OG/Twitter metadata, favicon set, semantic headings и accessibility states.
 
@@ -76,7 +76,7 @@
 - `node --check api/send-lead.js`;
 - CSS parse-check для tokens/typography/global/privacy styles;
 - HTML metadata/structure check для `index.html` и Privacy;
-- decode/dimension check всех WebP case images и portrait;
+- decode/dimension check всех WebP case images и portrait variants;
 - scan на TODO/FIXME/HACK, explicit `any`, browser `alert`, hard-coded secrets — проблем не найдено;
 - asset-size audit: весь `public/` меньше 1 MB, case media оптимизированы.
 

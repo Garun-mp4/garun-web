@@ -35,7 +35,7 @@ export class About extends React.Component {
       <div className="about-frame" ref={this.frameRef}>
         <div className="about-frame__content">
           <div className="about-identity">
-            <div className="about-portrait"><img src="/images/portrait/hero-img-soft.webp" alt="Гарун — frontend-разработчик" width="600" height="741" loading="lazy" decoding="async" /></div>
+            <div className="about-portrait"><img src="/images/portrait/portrait-about.webp" srcSet="/images/portrait/portrait-about-384.webp 384w, /images/portrait/portrait-about.webp 768w" sizes="(max-width: 809px) 110px, (max-width: 1199px) 128px, 160px" alt="Гарун — frontend-разработчик" width="768" height="768" loading="lazy" decoding="async" /></div>
             <h2 id="about-title">ПРИВЕТ — Я<br/>ГАРУН</h2>
           </div>
           <div className="about-copy">
