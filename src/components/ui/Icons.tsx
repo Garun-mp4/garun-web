@@ -9,6 +9,14 @@ export function ExternalIcon(): React.ReactElement {
   return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 5h5v5M19 5l-8 8"/><path d="M17 13v5a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1h5"/></svg>;
 }
 
+export function ArrowLeftIcon(): React.ReactElement {
+  return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12H4M10 6l-6 6 6 6" /></svg>;
+}
+
+export function ArrowRightIcon(): React.ReactElement {
+  return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h16M14 6l6 6-6 6" /></svg>;
+}
+
 export function PlusIcon({ open = false }: { open?: boolean }): React.ReactElement {
   return <span className={`plus-icon${open ? ' is-open' : ''}`} aria-hidden="true"><i/><i/></span>;
 }

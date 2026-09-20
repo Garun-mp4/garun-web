@@ -1,10 +1,10 @@
 import React from 'react';
-import { ExternalIcon } from '../../components/ui/Icons.js';
+import { ArrowLeftIcon, ArrowRightIcon, ExternalIcon } from '../../components/ui/Icons.js';
 
-interface State { active: boolean; label: string; light: boolean; }
+interface State { active: boolean; label: string; slider: boolean; visible: boolean; }
 
 export class CustomCursor extends React.Component<Record<string, never>, State> {
-  state: State = { active: false, label: '', light: false };
+  state: State = { active: false, label: '', slider: false, visible: false };
   private cursorRef = React.createRef<HTMLDivElement>();
   private x = -100;
   private y = -100;
@@ -17,15 +17,13 @@ export class CustomCursor extends React.Component<Record<string, never>, State> 
     document.documentElement.classList.add('has-custom-cursor');
     this.forceUpdate();
     window.addEventListener('pointermove', this.onMove, { passive: true });
-    document.addEventListener('pointerover', this.onOver);
-    document.addEventListener('pointerout', this.onOut);
+    window.addEventListener('blur', this.onBlur);
   }
 
   componentWillUnmount(): void {
     document.documentElement.classList.remove('has-custom-cursor');
     window.removeEventListener('pointermove', this.onMove);
-    document.removeEventListener('pointerover', this.onOver);
-    document.removeEventListener('pointerout', this.onOut);
+    window.removeEventListener('blur', this.onBlur);
     cancelAnimationFrame(this.raf);
   }
 
@@ -33,31 +31,32 @@ export class CustomCursor extends React.Component<Record<string, never>, State> 
     this.x = event.clientX;
     this.y = event.clientY;
     const target = document.elementFromPoint(this.x, this.y) as HTMLElement | null;
-    const dark = Boolean(target?.closest('.section-dark, .about-frame, .final-cta__panel'));
-    if (dark !== this.state.light) this.setState({ light: dark });
+    const slider = Boolean(target?.closest('.hero-preview__frame'));
+    const action = !slider ? target?.closest<HTMLElement>('[data-cursor-label]') : null;
+    const nextState: State = {
+      active: Boolean(action),
+      label: action?.dataset.cursorLabel || '',
+      slider,
+      visible: true,
+    };
+    if (this.state.active !== nextState.active || this.state.label !== nextState.label || this.state.slider !== nextState.slider || !this.state.visible) {
+      this.setState(nextState);
+    }
     cancelAnimationFrame(this.raf);
     this.raf = requestAnimationFrame(() => {
       if (this.cursorRef.current) this.cursorRef.current.style.transform = `translate3d(${this.x}px, ${this.y}px, 0)`;
     });
   };
 
-  onOver = (event: PointerEvent): void => {
-    const target = event.target as HTMLElement | null;
-    const action = target?.closest<HTMLElement>('[data-cursor-label]');
-    if (action) this.setState({ active: true, label: action.dataset.cursorLabel || 'ОТКРЫТЬ' });
-  };
-
-  onOut = (event: PointerEvent): void => {
-    const target = event.target as HTMLElement | null;
-    const action = target?.closest<HTMLElement>('[data-cursor-label]');
-    const related = event.relatedTarget as HTMLElement | null;
-    if (action && (!related || !action.contains(related))) this.setState({ active: false, label: '' });
+  onBlur = (): void => {
+    if (this.state.visible) this.setState({ visible: false, active: false, label: '', slider: false });
   };
 
   render(): React.ReactElement | null {
     if (!this.enabled) return null;
-    return <div className={`custom-cursor${this.state.active ? ' is-action' : ''}${this.state.light ? ' is-light' : ''}`} ref={this.cursorRef} aria-hidden="true">
-      {this.state.active ? <span><ExternalIcon />{this.state.label}</span> : null}
+    return <div className={`custom-cursor${this.state.active ? ' is-action' : ''}${this.state.slider ? ' is-slider' : ''}${this.state.visible ? ' is-visible' : ''}`} ref={this.cursorRef} aria-hidden="true">
+      {this.state.slider ? <><span className="custom-cursor__arrow"><ArrowLeftIcon /></span><span className="custom-cursor__arrow"><ArrowRightIcon /></span></> : null}
+      {this.state.active ? <span className="custom-cursor__action"><ExternalIcon />{this.state.label}</span> : null}
     </div>;
   }
 }

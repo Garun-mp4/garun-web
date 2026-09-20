@@ -32,9 +32,23 @@ test('homepage interactions, featured projects, FAQ and contact route work', asy
     return rect.width / rect.height;
   });
   expect(previewRatio).toBeCloseTo(16 / 9, 1);
-  await expect(marqueeTrack).toHaveCSS('animation-name', 'hero-preview-marquee');
-  await heroPreview.hover();
-  await expect(marqueeTrack).toHaveCSS('animation-play-state', 'paused');
+  await expect(marqueeTrack).toHaveClass(/is-controlled/);
+  await expect(marqueeTrack).toHaveCSS('animation-name', 'none');
+  const customCursor = page.locator('.custom-cursor');
+  await page.mouse.move(5, 5);
+  await expect(customCursor).toHaveClass(/is-visible/);
+  await expect(customCursor).toHaveCSS('width', '16px');
+  await expect(customCursor).toHaveCSS('mix-blend-mode', 'difference');
+  const previewFrame = heroPreview.locator('.hero-preview__frame');
+  const previewBounds = await previewFrame.boundingBox();
+  expect(previewBounds).not.toBeNull();
+  if (!previewBounds) throw new Error('Hero preview frame is not measurable');
+  await page.mouse.move(previewBounds.x + previewBounds.width * 0.75, previewBounds.y + previewBounds.height / 2);
+  await expect(customCursor).toHaveClass(/is-slider/);
+  await expect(customCursor).toHaveCSS('width', '50px');
+  const beforeManualAdvance = await marqueeTrack.evaluate(node => node.style.transform);
+  await page.mouse.click(previewBounds.x + previewBounds.width * 0.75, previewBounds.y + previewBounds.height / 2);
+  await expect.poll(() => marqueeTrack.evaluate(node => node.style.transform)).not.toBe(beforeManualAdvance);
   await page.getByRole('link', { name: 'Перейти к проектам' }).click();
   await expect(page.locator('#projects')).toBeInViewport();
 
