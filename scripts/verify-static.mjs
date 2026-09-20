@@ -67,7 +67,7 @@ for (const required of [
   'public/images/portrait/portrait-about.webp',
   'public/images/portrait/portrait-about-384.webp',
   'public/images/portrait/portrait-button.webp',
-  'public/privacy.html',
+  'privacy.html',
   'public/robots.txt',
   'public/sitemap.xml',
   '.env.example',
@@ -78,7 +78,7 @@ for (const required of [
 const sourceFiles = [
   ...(await walk('src')).filter(file => /\.(?:ts|tsx|css)$/.test(file)),
   'index.html',
-  'public/privacy.html',
+  'privacy.html',
   'public/privacy.css',
 ].filter((file, index, list) => list.indexOf(file) === index);
 

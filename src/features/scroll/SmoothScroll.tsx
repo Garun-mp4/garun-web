@@ -1,6 +1,7 @@
 import React from 'react';
-import Lenis from 'lenis';
+import type Lenis from 'lenis';
 import 'lenis/dist/lenis.css';
+import { createLenis } from './createLenis.js';
 
 let activeLenis: Lenis | null = null;
 
@@ -10,15 +11,7 @@ export function getSmoothScroll(): Lenis | null {
 
 export function SmoothScroll(): null {
   React.useEffect(() => {
-    const lenis = new Lenis({
-      duration: 2,
-      lerp: 0.1,
-      autoRaf: true,
-      anchors: true,
-      autoToggle: true,
-      allowNestedScroll: true,
-      stopInertiaOnNavigate: true,
-    });
+    const lenis = createLenis();
 
     activeLenis = lenis;
     const syncScrollLock = (): void => {

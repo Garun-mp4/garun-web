@@ -86,6 +86,8 @@ test('all client routes can be opened directly', async ({ page }) => {
     const response = await page.goto(route);
     expect(response?.status(), `Expected ${route} to return the SPA shell`).toBe(200);
     await expect(page.locator('main#main')).toBeVisible();
+    await expect(page.locator('html')).toHaveClass(/lenis-autoToggle/);
+    await expect(page.locator('html')).toHaveCSS('scroll-behavior', 'auto');
     const canonical = await page.locator('link[rel="canonical"]').getAttribute('href');
     expect(canonical).not.toBeNull();
     if (!canonical) throw new Error(`Canonical URL is missing for ${route}`);
@@ -93,6 +95,15 @@ test('all client routes can be opened directly', async ({ page }) => {
     expect(canonicalUrl.origin).toBe(new URL(page.url()).origin);
     expect(canonicalUrl.pathname).toBe(route);
   }
+});
+
+test('privacy policy uses the same smooth-scroll runtime', async ({ page }) => {
+  const errors = captureRuntimeErrors(page);
+  await page.goto('/privacy.html');
+  await expect(page.locator('h1')).toContainText('Политика конфиденциальности');
+  await expect(page.locator('html')).toHaveClass(/lenis-autoToggle/);
+  await expect(page.locator('html')).toHaveCSS('scroll-behavior', 'auto');
+  expect(errors).toEqual([]);
 });
 
 test('calculator validates and completes all seven steps', async ({ page }) => {
