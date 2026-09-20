@@ -13,6 +13,7 @@ export function Footer(): React.ReactElement {
         </nav>
         <div className="footer__links">
           <a href="https://t.me/garun_web" target="_blank" rel="noopener noreferrer">Telegram</a>
+          <a href="https://wa.me/79964206569" target="_blank" rel="noopener noreferrer">WhatsApp</a>
           <span className="footer__badge"><span>GARUN / FRONTEND</span><a href="/calculator">Калькулятор проекта ↗</a></span>
         </div>
       </div>
