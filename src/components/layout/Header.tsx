@@ -100,12 +100,16 @@ export class Header extends React.Component<Record<string, never>, State> {
         <LayerButton href="/contact" variant={this.state.inverse ? 'light' : 'dark'} portrait>СВЯЗАТЬСЯ</LayerButton>
       </div>
 
-      <button className="mobile-menu-trigger" type="button" aria-label={this.state.menuOpen ? 'Закрыть меню' : 'Открыть меню'} aria-expanded={this.state.menuOpen} aria-controls="mobile-menu" onClick={this.toggleMenu}>
-        <span>МЕНЮ</span><MenuIcon open={this.state.menuOpen} />
-      </button>
+      <div className="mobile-header-actions">
+        <LayerButton href="/contact" variant={this.state.inverse ? 'light' : 'dark'} portrait>КОНТАКТ</LayerButton>
+        <button className="mobile-menu-trigger" type="button" aria-label={this.state.menuOpen ? 'Закрыть меню' : 'Открыть меню'} aria-expanded={this.state.menuOpen} aria-controls="mobile-menu" onClick={this.toggleMenu}>
+          <span>МЕНЮ</span><MenuIcon open={this.state.menuOpen} />
+        </button>
+      </div>
 
       <div className={`mobile-menu-overlay${this.state.menuOpen ? ' is-open' : ''}`} id="mobile-menu" aria-hidden={!this.state.menuOpen}>
         <div className="mobile-menu-panel">
+          <a href="/" onClick={this.closeMenu}>ГЛАВНАЯ</a>
           <a href="/services" onClick={this.closeMenu}>УСЛУГИ</a>
           <a href="/projects" onClick={this.closeMenu}>ПРОЕКТЫ</a>
           <a href="/about" onClick={this.closeMenu}>ОБО МНЕ</a>

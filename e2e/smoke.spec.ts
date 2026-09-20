@@ -147,9 +147,16 @@ test('mobile menu is usable without hover', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
 
+  await expect(page.locator('.mobile-header-actions .layer-button')).toBeVisible();
   const trigger = page.getByRole('button', { name: 'Открыть меню' });
   await trigger.click();
   await expect(page.locator('#mobile-menu')).toHaveAttribute('aria-hidden', 'false');
+  await expect(page.locator('.mobile-menu-overlay')).toHaveCSS('backdrop-filter', /blur/);
+  const menuPanel = page.locator('.mobile-menu-panel');
+  const menuPanelBounds = await menuPanel.boundingBox();
+  expect(menuPanelBounds).not.toBeNull();
+  if (!menuPanelBounds) throw new Error('Mobile menu panel is not measurable');
+  expect(menuPanelBounds.y).toBeGreaterThan(400);
   await page.locator('#mobile-menu').getByRole('link', { name: 'ПРОЕКТЫ' }).click();
   await expect(page).toHaveURL(/\/projects$/);
   await expect(page.locator('#mobile-menu')).toHaveAttribute('aria-hidden', 'true');
