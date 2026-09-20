@@ -42,8 +42,9 @@
   --fs-lead-xl: 32px;
   --fs-lead: 28px;
   --fs-body: 20px;
-  --lh-display: .8em;
-  --lh-hero: .9em;
+  --lh-display: .9em;
+  --lh-heading: .92em;
+  --lh-hero: .96em;
   --lh-lead: 1.2em;
   --lh-body: 1.3em;
 }
