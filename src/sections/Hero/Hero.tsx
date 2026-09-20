@@ -9,6 +9,8 @@ const MANUAL_STEP_DURATION_MS = 460;
 type PointerSession = { pointerId: number; startX: number; startOffset: number; moved: boolean };
 
 export function Hero(): React.ReactElement {
+  const heroRef = React.useRef<HTMLElement>(null);
+  const heroGridRef = React.useRef<HTMLDivElement>(null);
   const previewFrameRef = React.useRef<HTMLDivElement>(null);
   const previewTrackRef = React.useRef<HTMLDivElement>(null);
   const offsetRef = React.useRef(0);
@@ -17,6 +19,40 @@ export function Hero(): React.ReactElement {
   const pointerSessionRef = React.useRef<PointerSession | null>(null);
   const manualTimeoutRef = React.useRef<number | null>(null);
   const manualUntilRef = React.useRef(0);
+
+  React.useEffect(() => {
+    const hero = heroRef.current;
+    const grid = heroGridRef.current;
+    if (!hero || !grid) return undefined;
+
+    let animationFrame = 0;
+    const updateHeroMotion = (): void => {
+      animationFrame = 0;
+      const heroStart = hero.getBoundingClientRect().top + window.scrollY;
+      const heroHeight = Math.max(hero.offsetHeight, 1);
+      const progress = Math.min(1, Math.max(0, (window.scrollY - heroStart) / heroHeight));
+
+      hero.style.setProperty('--hero-sink-progress', progress.toFixed(4));
+      hero.style.setProperty('--hero-sink-scale', (1 - progress * 0.1).toFixed(4));
+      hero.style.setProperty('--hero-sink-offset', `${Math.round(progress * 180)}px`);
+      hero.style.setProperty('--hero-sink-opacity', (1 - progress).toFixed(4));
+      hero.classList.toggle('is-sunk', progress > 0.001);
+    };
+    const scheduleHeroMotion = (): void => {
+      if (animationFrame !== 0) return;
+      animationFrame = window.requestAnimationFrame(updateHeroMotion);
+    };
+
+    window.addEventListener('scroll', scheduleHeroMotion, { passive: true });
+    window.addEventListener('resize', scheduleHeroMotion, { passive: true });
+    updateHeroMotion();
+
+    return () => {
+      window.removeEventListener('scroll', scheduleHeroMotion);
+      window.removeEventListener('resize', scheduleHeroMotion);
+      if (animationFrame !== 0) window.cancelAnimationFrame(animationFrame);
+    };
+  }, []);
 
   const applyTrackOffset = React.useCallback((rawOffset: number, normalize = true): number => {
     const cycleWidth = cycleWidthRef.current;
@@ -78,7 +114,10 @@ export function Hero(): React.ReactElement {
     if (!frame || !track) return undefined;
 
     const syncShotWidth = (): void => {
-      frame.style.setProperty('--hero-shot-width', `${Math.max(1, frame.clientWidth - 8)}px`);
+      frame.style.aspectRatio = 'auto';
+      const shotWidth = Math.max(1, frame.getBoundingClientRect().width - 8);
+      frame.style.setProperty('--hero-shot-width', `${shotWidth}px`);
+      frame.style.height = `${shotWidth * (2 / 3) + 8}px`;
       const firstShot = track.querySelector<HTMLElement>('.hero-preview__shot');
       if (!firstShot) return;
       const marginRight = Number.parseFloat(getComputedStyle(firstShot).marginRight) || 0;
@@ -113,6 +152,9 @@ export function Hero(): React.ReactElement {
       }
       track.classList.remove('is-controlled');
       track.style.transition = '';
+      frame.style.removeProperty('--hero-shot-width');
+      frame.style.removeProperty('height');
+      frame.style.removeProperty('aspect-ratio');
     };
   }, [applyTrackOffset]);
 
@@ -174,8 +216,8 @@ export function Hero(): React.ReactElement {
 
   const previewProjects = [...projects, ...projects];
 
-  return <section className="hero" id="top" aria-labelledby="hero-title">
-    <div className="hero__grid">
+  return <section className="hero" id="top" aria-labelledby="hero-title" ref={heroRef}>
+    <div className="hero__grid" ref={heroGridRef}>
       <h1 className="hero__title" id="hero-title">
         <span className="hero-line"><span>ЛЕНДИНГИ, КОТОРЫЕ</span></span>
         <span className="hero-line"><span>ПОНЯТНО ОБЪЯСНЯЮТ</span></span>

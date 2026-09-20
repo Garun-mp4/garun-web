@@ -26,6 +26,16 @@ interface TouchScrollState {
   className: string;
 }
 
+interface HeroLayout {
+  title: { x: number };
+  frame: { x: number; width: number; height: number };
+  copy: { top: number };
+  caption: { bottom: number };
+  frameRatio: number;
+  copyGap: number;
+  frameBorder: string;
+}
+
 test('homepage interactions, featured projects, FAQ and contact route work', async ({ page }) => {
   test.skip(test.info().project.name === 'mobile-chromium', 'Desktop navigation interaction is covered by the dedicated mobile menu test.');
   const errors = captureRuntimeErrors(page);
@@ -48,7 +58,7 @@ test('homepage interactions, featured projects, FAQ and contact route work', asy
     const rect = node.getBoundingClientRect();
     return rect.width / rect.height;
   });
-  expect(previewRatio).toBeCloseTo(16 / 9, 1);
+  expect(previewRatio).toBeCloseTo(3 / 2, 1);
   await expect(marqueeTrack).toHaveClass(/is-controlled/);
   await expect(marqueeTrack).toHaveCSS('animation-name', 'none');
   const customCursor = page.locator('.custom-cursor');
@@ -79,7 +89,7 @@ test('homepage interactions, featured projects, FAQ and contact route work', asy
   await page.mouse.click(previewBounds.x + previewBounds.width * 0.75, previewBounds.y + previewBounds.height / 2);
   await expect.poll(() => marqueeTrack.evaluate(node => node.style.transform)).not.toBe(beforeManualAdvance);
   await page.getByRole('link', { name: 'Перейти к проектам' }).click();
-  await expect(page.locator('#projects')).toBeInViewport();
+  await expect(page.locator('#projects')).toBeInViewport({ timeout: 15_000 });
 
   const faq = page.locator('.faq-row > button').first();
   await faq.click();
@@ -89,6 +99,8 @@ test('homepage interactions, featured projects, FAQ and contact route work', asy
   await expect(page.locator('.project-row')).toHaveCount(6);
   await expect(page.locator('.project-row').first()).toHaveAttribute('href', /^https:\/\//);
 
+  await page.evaluate('window.scrollTo(0, 0)');
+  await expect(page.locator('.site-header')).not.toHaveClass(/is-hidden/);
   await page.getByRole('link', { name: 'СВЯЗАТЬСЯ' }).first().click();
   await expect(page).toHaveURL(/\/contact$/);
   await expect(page.getByRole('heading', { name: 'РАССКАЖИТЕ О ЗАДАЧЕ' })).toBeVisible();
@@ -168,6 +180,61 @@ test('touch scrolling uses Lenis smooth mode on mobile', async ({ page }) => {
 
   expect(touchState.touchEnabled).toBe(true);
   expect(touchState.className).toMatch(/\blenis-smooth\b/);
+});
+
+test('mobile hero follows the reference composition and case frame ratio', async ({ page }) => {
+  test.skip(test.info().project.name !== 'mobile-chromium', 'The composition assertions are covered by the mobile project.');
+  await page.setViewportSize({ width: 468, height: 886 });
+  await page.goto('/');
+  await page.evaluate('document.fonts.ready');
+  await page.waitForTimeout(1_400);
+
+  const layout = await page.evaluate<HeroLayout>(`(() => {
+    const rect = (selector) => {
+      const element = document.querySelector(selector);
+      if (!element) throw new Error(\`Missing \${selector}\`);
+      const bounds = element.getBoundingClientRect();
+      return { x: bounds.x, top: bounds.top, width: bounds.width, height: bounds.height, bottom: bounds.bottom };
+    };
+    const title = rect('.hero__title');
+    const frame = rect('.hero-preview__frame');
+    const copy = rect('.hero__copy');
+    const caption = rect('.hero-preview__caption');
+    const frameStyle = getComputedStyle(document.querySelector('.hero-preview__frame'));
+    return {
+      title,
+      frame,
+      copy,
+      caption,
+      frameRatio: frame.width / frame.height,
+      copyGap: copy.top - caption.bottom,
+      frameBorder: frameStyle.borderTopWidth,
+    };
+  })()`);
+
+  expect(layout.title.x).toBeCloseTo(16, 0);
+  expect(layout.frame.x).toBeCloseTo(16, 0);
+  expect(layout.frame.width / (468 - 32)).toBeCloseTo(0.7, 1);
+  expect(layout.frameRatio).toBeGreaterThan(1.45);
+  expect(layout.frameRatio).toBeLessThan(1.52);
+  expect(layout.frameBorder).toBe('1px');
+  expect(layout.copyGap).toBeGreaterThan(55);
+  expect(layout.copyGap).toBeLessThan(90);
+});
+
+test('header hides by direction and hero sinks while scrolling', async ({ page }) => {
+  await page.setViewportSize({ width: 468, height: 886 });
+  await page.goto('/');
+  await page.evaluate('document.fonts.ready');
+
+  await page.mouse.wheel(0, 320);
+  await expect(page.locator('.site-header')).toHaveClass(/is-hidden/);
+  await expect(page.locator('.hero')).toHaveClass(/is-sunk/);
+  await expect.poll(() => page.locator('.hero').getAttribute('style')).toMatch(/--hero-sink-opacity: 0\./);
+
+  await page.mouse.wheel(0, -320);
+  await expect(page.locator('.site-header')).not.toHaveClass(/is-hidden/);
+  await expect(page.locator('.hero')).not.toHaveClass(/is-sunk/);
 });
 
 test('responsive headings stay inside the viewport on every route', async ({ page }) => {

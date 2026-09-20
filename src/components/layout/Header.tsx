@@ -2,18 +2,22 @@ import React from 'react';
 import { LayerButton } from '../ui/LayerButton.js';
 import { ChevronDown, MenuIcon } from '../ui/Icons.js';
 
-interface State { servicesOpen: boolean; menuOpen: boolean; inverse: boolean; }
+interface State { servicesOpen: boolean; menuOpen: boolean; inverse: boolean; hidden: boolean; }
 
 export class Header extends React.Component<Record<string, never>, State> {
-  state: State = { servicesOpen: false, menuOpen: false, inverse: false };
+  state: State = { servicesOpen: false, menuOpen: false, inverse: false, hidden: false };
   private rootRef = React.createRef<HTMLElement>();
   private themeRaf: number | null = null;
+  private scrollRaf: number | null = null;
+  private lastScrollY = 0;
 
   componentDidMount(): void {
     document.addEventListener('pointerdown', this.handleOutside);
     document.addEventListener('keydown', this.handleKey);
     window.addEventListener('scroll', this.scheduleThemeUpdate, { passive: true });
+    window.addEventListener('scroll', this.scheduleHeaderUpdate, { passive: true });
     window.addEventListener('resize', this.scheduleThemeUpdate, { passive: true });
+    this.lastScrollY = window.scrollY;
     this.scheduleThemeUpdate();
   }
 
@@ -21,11 +25,32 @@ export class Header extends React.Component<Record<string, never>, State> {
     document.removeEventListener('pointerdown', this.handleOutside);
     document.removeEventListener('keydown', this.handleKey);
     window.removeEventListener('scroll', this.scheduleThemeUpdate);
+    window.removeEventListener('scroll', this.scheduleHeaderUpdate);
     window.removeEventListener('resize', this.scheduleThemeUpdate);
     if (this.themeRaf !== null) window.cancelAnimationFrame(this.themeRaf);
+    if (this.scrollRaf !== null) window.cancelAnimationFrame(this.scrollRaf);
     document.body.classList.remove('menu-open');
   }
 
+  scheduleHeaderUpdate = (): void => {
+    if (this.scrollRaf !== null) return;
+    this.scrollRaf = window.requestAnimationFrame(() => {
+      this.scrollRaf = null;
+      const currentScrollY = window.scrollY;
+      const direction = currentScrollY - this.lastScrollY;
+      this.lastScrollY = currentScrollY;
+
+      if (this.state.menuOpen) {
+        if (this.state.hidden) this.setState({ hidden: false });
+        return;
+      }
+
+      const shouldShow = currentScrollY <= 24 || direction < -1;
+      const shouldHide = currentScrollY > 32 && direction > 1;
+      if (shouldShow && this.state.hidden) this.setState({ hidden: false });
+      if (shouldHide && !this.state.hidden) this.setState({ hidden: true });
+    });
+  };
 
   scheduleThemeUpdate = (): void => {
     if (this.themeRaf !== null) window.cancelAnimationFrame(this.themeRaf);
@@ -51,7 +76,7 @@ export class Header extends React.Component<Record<string, never>, State> {
 
   handleKey = (event: KeyboardEvent): void => {
     if (event.key === 'Escape') {
-      this.setState({ servicesOpen: false, menuOpen: false });
+      this.setState({ servicesOpen: false, menuOpen: false, hidden: false });
       document.body.classList.remove('menu-open');
     }
   };
@@ -60,12 +85,12 @@ export class Header extends React.Component<Record<string, never>, State> {
     this.setState(prev => {
       const next = !prev.menuOpen;
       document.body.classList.toggle('menu-open', next);
-      return { ...prev, menuOpen: next, servicesOpen: false };
+      return { ...prev, menuOpen: next, servicesOpen: false, hidden: next ? false : prev.hidden };
     });
   };
 
   closeMenu = (): void => {
-    this.setState({ menuOpen: false });
+    this.setState({ menuOpen: false, hidden: false });
     document.body.classList.remove('menu-open');
   };
 
@@ -73,7 +98,7 @@ export class Header extends React.Component<Record<string, never>, State> {
     const path = window.location.pathname.replace(/\/+$/, '') || '/';
     const active = (route: string): string => path === route ? ' is-active' : '';
 
-    return <header className={`site-header${this.state.inverse ? ' is-inverse' : ''}`} ref={this.rootRef}>
+    return <header className={`site-header${this.state.inverse ? ' is-inverse' : ''}${this.state.hidden ? ' is-hidden' : ''}`} ref={this.rootRef}>
       <a className="brand-mark" href="/" aria-label="На первый экран">
         <img src={this.state.inverse ? '/assets/logo-mark-light.svg' : '/assets/logo-mark.svg'} alt="" width="40" height="40" />
       </a>
