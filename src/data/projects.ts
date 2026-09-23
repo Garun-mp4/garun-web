@@ -15,7 +15,7 @@ export const projects: Project[] = [
   },
   {
     id: 'mos-reg-guide', index: '04', title: 'МОСРЕГГИД', category: 'ДОКУМЕНТЫ', format: 'LANDING',
-    url: 'https://mos-reg-guide.vercel.app/', image: '/images/cases/mos-reg-guide.webp', alt: 'Лендинг сервиса регистрации МосРегГид'
+    url: 'https://mos-reg-guide.vercel.app/', image: '/images/cases/mos-reg-guide.webp', alt: 'Новый дизайн сайта МосРегГид с маршрутом оформления регистрации'
   },
   {
     id: 'farm-milk', index: '05', title: 'ФЕРМЕРСКОЕ МОЛОКО', category: 'ПРОДУКТ', format: 'LANDING',
