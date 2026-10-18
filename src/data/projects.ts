@@ -22,8 +22,8 @@ export const projects: Project[] = [
     url: 'https://farm-milk-self.vercel.app/', image: '/images/cases/farm-milk-self.webp', alt: 'Продуктовый лендинг фермерского молока'
   },
   {
-    id: 'ceiling-premium', index: '06', title: 'ПОТОЛОК.ПРЕМИУМ', category: 'НАТЯЖНЫЕ ПОТОЛКИ', format: 'LANDING',
-    url: 'https://ceiling-premium.vercel.app/', image: '/images/cases/ceiling-premium.webp', alt: 'Лендинг натяжных потолков Потолок Премиум'
+    id: 'ceiling-pole', index: '06', title: 'ПОЛЕ', category: 'ПОТОЛКИ И ОСВЕЩЕНИЕ', format: 'MULTIPAGE',
+    url: 'https://ceiling-pole.vercel.app/', image: '/images/cases/ceiling-pole.webp', alt: 'Многостраничный сайт ПОЛЕ — натяжные потолки и продуманный свет в Астрахани'
   },
   {
     id: 'studio-18', index: '07', title: 'STUDIO 18', category: 'BEAUTY', format: 'LANDING',
